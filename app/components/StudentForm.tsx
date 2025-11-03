@@ -24,11 +24,43 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    
+    // Validate full name field - no numbers allowed
+    if (name === "fullName") {
+      const hasNumbers = /\d/.test(value);
+      if (hasNumbers) {
+        setNameError("Name cannot contain numbers");
+        return;
+      } else {
+        setNameError("");
+      }
+    }
+    
+    // Validate phone number - only numbers and must be 10 digits
+    if (name === "phone") {
+      // Remove all non-numeric characters for validation
+      const numericValue = value.replace(/\D/g, '');
+      
+      if (value && !/^\d*$/.test(value.replace(/[\s\-\+]/g, ''))) {
+        setPhoneError("Phone number can only contain digits");
+        return;
+      }
+      
+      if (numericValue.length > 0 && numericValue.length !== 10) {
+        setPhoneError("Phone number must be exactly 10 digits");
+      } else {
+        setPhoneError("");
+      }
+    }
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
@@ -150,8 +182,18 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
                           onChange={handleChange}
                           required
                           placeholder="Enter your full name"
-                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400"
+                          className={`w-full px-4 py-3 rounded-xl border ${
+                            nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                          } focus:outline-none focus:ring-2 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400`}
                         />
+                        {nameError && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {nameError}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -202,9 +244,20 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
                             onChange={handleChange}
                             required
                             placeholder="+91 98765 43210"
-                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400"
+                            maxLength={10}
+                            className={`w-full pl-12 pr-4 py-3 rounded-xl border ${
+                              phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'
+                            } focus:outline-none focus:ring-2 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400`}
                           />
                         </div>
+                        {phoneError && (
+                          <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                            {phoneError}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
