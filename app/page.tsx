@@ -90,7 +90,7 @@ export default function Home() {
     {
       name: "Raghav Sharma",
       role: "Computer Science Student",
-      text: "SikshaFlow has completely transformed how I manage my studies. Everything is so organized and intuitive!",
+      text: "ShikshaFlow has completely transformed how I manage my studies. Everything is so organized and intuitive!",
       avatar: "RS"
     },
     {
@@ -102,7 +102,7 @@ export default function Home() {
     {
       name: "Navya Umat",
       role: "Engineering Student",
-      text: "I love how SikshaFlow keeps me updated on everything. No more missing deadlines or important announcements!",
+      text: "I love how ShikshaFlow keeps me updated on everything. No more missing deadlines or important announcements!",
       avatar: "NU"
     }
   ];
@@ -143,7 +143,7 @@ export default function Home() {
               variants={fadeInUp}
               className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto"
             >
-              SikshaFlow is a smart education management platform designed to streamline university life—from assignments to analytics.
+              ShikshaFlow is a smart education management platform designed to streamline university life—from assignments to analytics.
             </motion.p>
 
             <motion.div 
@@ -326,7 +326,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-orange-400 bg-clip-text text-transparent">
-                SikshaFlow
+                ShikshaFlow
               </h3>
               <p className="text-gray-400 mb-4">
                 Reimagining education for a smarter tomorrow.
@@ -379,7 +379,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} SikshaFlow. All rights reserved. Made with ❤️ for education.</p>
+            <p>&copy; {new Date().getFullYear()} ShikshaFlow. All rights reserved. Made with ❤️ for education.</p>
           </div>
         </div>
       </footer>
