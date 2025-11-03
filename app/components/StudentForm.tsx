@@ -18,8 +18,9 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
     university: "",
     course: "",
     year: "",
+    semester: "",
     city: "",
-    rollNumber: "",
+    studentId: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,6 +59,16 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
       }
     }
     
+    // Reset semester when year changes
+    if (name === "year") {
+      setFormData({
+        ...formData,
+        year: value,
+        semester: "",
+      });
+      return;
+    }
+    
     setFormData({
       ...formData,
       [name]: value,
@@ -86,8 +97,9 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
         university: "",
         course: "",
         year: "",
+        semester: "",
         city: "",
-        rollNumber: "",
+        studentId: "",
       });
     }, 2000);
   };
@@ -324,16 +336,36 @@ export default function StudentForm({ isOpen, onClose }: StudentFormProps) {
                         </select>
                       </div>
 
+                      {formData.year && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Semester *
+                          </label>
+                          <select
+                            name="semester"
+                            value={formData.semester}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900"
+                          >
+                            <option value="" className="text-gray-500">Select semester</option>
+                            <option value={`${formData.year}-1`} className="text-gray-900">Semester 1</option>
+                            <option value={`${formData.year}-2`} className="text-gray-900">Semester 2</option>
+                          </select>
+                        </div>
+                      )}
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Roll Number
+                          Student ID *
                         </label>
                         <input
                           type="text"
-                          name="rollNumber"
-                          value={formData.rollNumber}
+                          name="studentId"
+                          value={formData.studentId}
                           onChange={handleChange}
-                          placeholder="Enter your roll number"
+                          required
+                          placeholder="Enter your student ID"
                           className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-gray-900 placeholder:text-gray-400"
                         />
                       </div>

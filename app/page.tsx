@@ -315,52 +315,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Join the Flow CTA Section */}
-      <section id="join" className="py-20 bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 text-white relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s' }}></div>
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to Join the Flow?
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl mb-12 opacity-90">
-              Start your journey to smarter education today. Get early access and exclusive updates.
-            </motion.p>
-
-            <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-xl mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-6 py-4 rounded-full text-gray-900 focus:outline-none focus:ring-4 focus:ring-orange-300 text-lg"
-              />
-              <button 
-                onClick={() => setIsFormOpen(true)}
-                className="whitespace-nowrap px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </motion.div>
-
-            <motion.p variants={fadeInUp} className="mt-6 text-sm opacity-75">
-              No credit card required • Free for students
-            </motion.p>
-          </motion.div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-6">
