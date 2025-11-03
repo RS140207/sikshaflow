@@ -464,6 +464,94 @@ function TopicsContent() {
     }
   }, [isModalOpen]);
 
+  // Listen for storage changes from other tabs (when videos are completed)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      // Check if a video completion was updated
+      if (e.key && e.key.startsWith('video-completed-') && e.newValue === 'true') {
+        console.log('Storage change detected:', e.key, 'New value:', e.newValue);
+        
+        // Extract the subtopic title from the key
+        const subtopicTitle = e.key.replace('video-completed-', '');
+        
+        // Update the topics state to reflect the completion
+        setTopics(prevTopics =>
+          prevTopics.map(topic => ({
+            ...topic,
+            subtopics: topic.subtopics.map(st =>
+              st.title === subtopicTitle
+                ? { ...st, completed: true }
+                : st
+            )
+          }))
+        );
+
+        // If modal is open, update selected topic as well
+        if (selectedTopic) {
+          setSelectedTopic(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              subtopics: prev.subtopics.map(st =>
+                st.title === subtopicTitle
+                  ? { ...st, completed: true }
+                  : st
+              )
+            };
+          });
+        }
+      }
+    };
+
+    // Handle messages from child windows (video tabs)
+    const handleMessage = (event: MessageEvent) => {
+      // Verify the message is from our domain
+      if (event.origin !== window.location.origin) return;
+      
+      if (event.data.type === 'videoCompleted') {
+        const subtopicTitle = event.data.subtopicTitle;
+        console.log('Video completion message received:', subtopicTitle);
+        
+        // Update the topics state to reflect the completion
+        setTopics(prevTopics =>
+          prevTopics.map(topic => ({
+            ...topic,
+            subtopics: topic.subtopics.map(st =>
+              st.title === subtopicTitle
+                ? { ...st, completed: true }
+                : st
+            )
+          }))
+        );
+
+        // If modal is open, update selected topic as well
+        if (selectedTopic) {
+          setSelectedTopic(prev => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              subtopics: prev.subtopics.map(st =>
+                st.title === subtopicTitle
+                  ? { ...st, completed: true }
+                  : st
+              )
+            };
+          });
+        }
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('message', handleMessage);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('message', handleMessage);
+    };
+  }, [selectedTopic]);
+
   const handleTopicComplete = (topicId: string, xpReward: number) => {
     // Update topic completion status
     setTopics(prevTopics => 

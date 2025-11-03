@@ -111,6 +111,23 @@ function VideosContent() {
     const completedKey = `video-completed-${topicTitle}`;
     localStorage.setItem(completedKey, 'true');
     
+    // Dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('videoCompleted', { 
+      detail: { subtopicTitle: topicTitle } 
+    }));
+    
+    // Try to notify the opener window (parent tab) if it exists
+    if (window.opener && !window.opener.closed) {
+      try {
+        window.opener.postMessage({ 
+          type: 'videoCompleted', 
+          subtopicTitle: topicTitle 
+        }, window.location.origin);
+      } catch (err) {
+        console.log('Could not notify opener window:', err);
+      }
+    }
+    
     // Auto-hide message after 3 seconds
     setTimeout(() => {
       setShowCompletionMessage(false);
