@@ -11,26 +11,37 @@ import {
   ArrowLeft,
   BookOpen,
   Trophy,
-  Star
+  Star,
+  Loader2,
+  LogOut
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, Suspense } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 function SubjectsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, loading, logout } = useAuth();
   const [studentName, setStudentName] = useState("Student");
   const [year, setYear] = useState("1");
   const [semester, setSemester] = useState("1");
 
+  // Redirect to login if not authenticated
   useEffect(() => {
-    const name = searchParams.get("name") || "Student";
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
+
+  useEffect(() => {
+    const name = searchParams.get("name") || user?.email?.split('@')[0] || "Student";
     const yr = searchParams.get("year") || "1";
     const sem = searchParams.get("semester") || "1";
     setStudentName(name);
     setYear(yr);
     setSemester(sem);
-  }, [searchParams]);
+  }, [searchParams, user]);
 
   const subjects = [
     {
@@ -109,6 +120,32 @@ function SubjectsContent() {
     router.push(`/topics?subject=${subjectId}`);
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render content if user is not authenticated
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
@@ -129,9 +166,19 @@ function SubjectsContent() {
                 <p className="text-sm text-gray-600">Year {year} - Semester {semester}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Welcome,</p>
-              <p className="font-semibold text-gray-900">{studentName}</p>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-600">Welcome,</p>
+                <p className="font-semibold text-gray-900">{studentName}</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>

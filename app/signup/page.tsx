@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff, Loader2, GraduationCap } from "lucide-react";
 import Link from "next/link";
@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { signup } = useAuth();
+  const { signup, user, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +23,13 @@ export default function SignUpPage() {
     password: "",
     confirmPassword: "",
   });
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/subjects");
+    }
+  }, [user, loading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -100,6 +107,18 @@ export default function SignUpPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
