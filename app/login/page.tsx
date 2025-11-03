@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { 
@@ -18,7 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,6 +27,18 @@ export default function LoginPage() {
     rememberMe: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      const isTeacher = localStorage.getItem(`user-role-email-${user.email}`) === "teacher";
+      if (isTeacher) {
+        router.push("/teacher/dashboard");
+      } else {
+        router.push("/subjects");
+      }
+    }
+  }, [user, loading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -68,8 +80,13 @@ export default function LoginPage() {
 
     try {
       await login(formData.email, formData.password);
-      // Redirect to subjects page after successful login
-      router.push("/subjects");
+      // Check user role and redirect accordingly
+      const isTeacher = localStorage.getItem(`user-role-email-${formData.email}`) === "teacher";
+      if (isTeacher) {
+        router.push("/teacher/dashboard");
+      } else {
+        router.push("/subjects");
+      }
     } catch (error: any) {
       console.error("Login error:", error);
       let errorMessage = "Invalid email or password";
@@ -89,6 +106,18 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
