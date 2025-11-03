@@ -38,7 +38,7 @@ export default function Navigation({ onGetStartedClick }: NavigationProps) {
               <span className="text-white font-bold text-xl">S</span>
             </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-orange-500 bg-clip-text text-transparent">
-              SikshaFlow
+              ShikshaFlow
             </span>
           </a>
 
