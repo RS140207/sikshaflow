@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Home, Trophy, Star, Target, TrendingUp } from "lucide-react";
 import XPBar from "../components/XPBar";
 import TopicCard from "../components/TopicCard";
+import TopicDetailModal from "../components/TopicDetailModal";
 import AchievementPopup from "../components/AchievementPopup";
 
 // Define all topics for each subject
@@ -198,6 +199,184 @@ const getSubjectName = (id: string): string => {
   return names[id] || "Subject";
 };
 
+// Define subtopics for each topic
+const topicSubtopics: { [key: string]: Array<{ id: string; title: string }> } = {
+  // Mathematics
+  "matrices": [
+    { id: "hermitian", title: "Hermitian, unitary & orthogonal matrices" },
+    { id: "rank-inverse", title: "Rank and inverse using Gauss-Jordan method" },
+    { id: "eigenvalues", title: "Eigenvalues and eigenvectors" },
+    { id: "cayley-hamilton", title: "Cayley-Hamilton theorem" }
+  ],
+  "differential-calculus": [
+    { id: "partial-derivatives", title: "Partial derivatives and Euler's theorem" },
+    { id: "total-derivatives", title: "Total derivatives and Jacobian" },
+    { id: "taylor-series", title: "Taylor and Maclaurin series" },
+    { id: "maxima-minima", title: "Maxima and minima" },
+    { id: "lagrange", title: "Lagrange multipliers" }
+  ],
+  "integral-calculus": [
+    { id: "double-integrals", title: "Double integrals (Cartesian & polar)" },
+    { id: "triple-integrals", title: "Triple integrals" },
+    { id: "change-variables", title: "Change of variables" },
+    { id: "beta-gamma", title: "Beta and Gamma functions" }
+  ],
+  "vector-calculus": [
+    { id: "gradient", title: "Gradient, divergence, and curl" },
+    { id: "line-integral", title: "Line integrals" },
+    { id: "surface-volume", title: "Surface and volume integrals" },
+    { id: "greens-theorem", title: "Green's theorem" },
+    { id: "stokes-gauss", title: "Stokes and Gauss divergence theorems" }
+  ],
+  // Engineering Graphics
+  "drawing-basics": [
+    { id: "instruments", title: "Drawing instruments and their usage" },
+    { id: "lettering", title: "Lettering and line types" },
+    { id: "projection-types", title: "Types of projections" },
+    { id: "dimensioning", title: "Dimensioning standards" },
+    { id: "orthographic", title: "Orthographic projection of points, lines, and lamina" }
+  ],
+  "projection-solids": [
+    { id: "prisms", title: "Projection of prisms" },
+    { id: "pyramids", title: "Projection of pyramids" },
+    { id: "cylinders", title: "Projection of cylinders" },
+    { id: "cones", title: "Projection of cones" },
+    { id: "sections", title: "Sections of solids" }
+  ],
+  "isometric": [
+    { id: "isometric-basics", title: "Isometric projection basics" },
+    { id: "isometric-scale", title: "Isometric scale" },
+    { id: "isometric-views", title: "Isometric views of simple objects" },
+    { id: "conversion", title: "Conversion from orthographic to isometric" }
+  ],
+  "autocad": [
+    { id: "autocad-basics", title: "AutoCAD interface and basics" },
+    { id: "2d-commands", title: "2D drawing commands" },
+    { id: "editing-tools", title: "Editing tools and layers" },
+    { id: "dimensioning-autocad", title: "Dimensioning in AutoCAD" },
+    { id: "3d-basics", title: "Introduction to 3D modeling" }
+  ],
+  // Engineering Mechanics
+  "force-systems": [
+    { id: "force-basics", title: "Force system basics and laws of mechanics" },
+    { id: "vector-algebra", title: "Vector algebra applied to forces" },
+    { id: "moments", title: "Moments and couples" },
+    { id: "lamis-theorem", title: "Lami's theorem" },
+    { id: "varignons", title: "Varignon's theorem" }
+  ],
+  "trusses": [
+    { id: "truss-basics", title: "Introduction to trusses" },
+    { id: "method-joints", title: "Method of joints" },
+    { id: "method-sections", title: "Method of sections" },
+    { id: "perfect-truss", title: "Perfect, deficient, and redundant trusses" }
+  ],
+  "moment-inertia": [
+    { id: "centroid", title: "Centroid of simple shapes" },
+    { id: "composite-shapes", title: "Centroid of composite shapes" },
+    { id: "moi-basics", title: "Moment of inertia basics" },
+    { id: "parallel-axis", title: "Parallel axis theorem" },
+    { id: "perpendicular-axis", title: "Perpendicular axis theorem" }
+  ],
+  "kinematics": [
+    { id: "rectilinear", title: "Rectilinear motion" },
+    { id: "curvilinear", title: "Curvilinear motion" },
+    { id: "projectile", title: "Projectile motion" },
+    { id: "relative-motion", title: "Relative motion" }
+  ],
+  "particle-dynamics": [
+    { id: "newtons-laws", title: "Newton's laws of motion" },
+    { id: "work-energy", title: "Work and energy principles" },
+    { id: "impulse-momentum", title: "Impulse and momentum" },
+    { id: "impact", title: "Impact and collisions" }
+  ],
+  "shear-bending": [
+    { id: "shear-force", title: "Shear force diagrams" },
+    { id: "bending-moment", title: "Bending moment diagrams" },
+    { id: "simply-supported", title: "Simply supported beams" },
+    { id: "cantilever", title: "Cantilever beams" },
+    { id: "overhanging", title: "Overhanging beams" }
+  ],
+  // Physics
+  "em-fields": [
+    { id: "coulombs-law", title: "Coulomb's law and electric fields" },
+    { id: "gauss-law", title: "Gauss's law" },
+    { id: "electric-potential", title: "Electric potential and energy" },
+    { id: "magnetic-fields", title: "Magnetic fields" },
+    { id: "amperes-law", title: "Ampere's law and applications" }
+  ],
+  "polarization": [
+    { id: "polarization-basics", title: "Light polarization basics" },
+    { id: "malus-law", title: "Malus's law" },
+    { id: "double-refraction", title: "Double refraction" },
+    { id: "wave-nature", title: "Wave nature of light" },
+    { id: "interference", title: "Interference and diffraction" }
+  ],
+  "wave-particle": [
+    { id: "photoelectric", title: "Photoelectric effect" },
+    { id: "compton-effect", title: "Compton effect" },
+    { id: "de-broglie", title: "De Broglie hypothesis" },
+    { id: "uncertainty", title: "Heisenberg uncertainty principle" },
+    { id: "wave-function", title: "Wave functions and probability" }
+  ],
+  "quantum-tunneling": [
+    { id: "schrodinger", title: "Schrödinger equation" },
+    { id: "potential-well", title: "Particle in a potential well" },
+    { id: "tunneling-basics", title: "Quantum tunneling basics" },
+    { id: "applications", title: "Applications in STM and radioactive decay" },
+    { id: "band-theory", title: "Introduction to band theory" }
+  ],
+  // Punjabi
+  "grammar": [
+    { id: "nouns-pronouns", title: "Nouns and pronouns (ਨਾਂਵ ਅਤੇ ਪੜਨਾਂਵ)" },
+    { id: "verbs", title: "Verbs and tenses (ਕਿਰਿਆ ਅਤੇ ਕਾਲ)" },
+    { id: "adjectives", title: "Adjectives and adverbs (ਵਿਸ਼ੇਸ਼ਣ)" },
+    { id: "sentence-structure", title: "Sentence structure (ਵਾਕ ਰਚਨਾ)" }
+  ],
+  "literature": [
+    { id: "poetry", title: "Punjabi poetry (ਪੰਜਾਬੀ ਕਵਿਤਾ)" },
+    { id: "prose", title: "Prose and essays (ਗੱਦ)" },
+    { id: "folk-literature", title: "Folk literature (ਲੋਕ ਸਾਹਿਤ)" },
+    { id: "modern-writers", title: "Modern Punjabi writers" }
+  ],
+  "composition": [
+    { id: "essay-writing", title: "Essay writing (ਲੇਖ ਲਿਖਣਾ)" },
+    { id: "letter-writing", title: "Letter writing (ਚਿੱਠੀ ਲਿਖਣੀ)" },
+    { id: "paragraph", title: "Paragraph writing (ਪੈਰਾ ਲਿਖਣਾ)" },
+    { id: "translation", title: "Translation skills (ਅਨੁਵਾਦ)" }
+  ],
+  "comprehension": [
+    { id: "reading", title: "Reading comprehension (ਪੜ੍ਹਨ ਦੀ ਸਮਝ)" },
+    { id: "vocabulary", title: "Vocabulary building (ਸ਼ਬਦ ਭੰਡਾਰ)" },
+    { id: "idioms", title: "Idioms and phrases (ਮੁਹਾਵਰੇ)" },
+    { id: "proverbs", title: "Punjabi proverbs (ਕਹਾਵਤਾਂ)" }
+  ],
+  // Entrepreneurship
+  "business-fundamentals": [
+    { id: "entrepreneurship-basics", title: "Introduction to entrepreneurship" },
+    { id: "business-models", title: "Business models and types" },
+    { id: "startup-ecosystem", title: "Startup ecosystem" },
+    { id: "legal-aspects", title: "Legal aspects of business" }
+  ],
+  "innovation": [
+    { id: "creative-thinking", title: "Creative thinking techniques" },
+    { id: "idea-generation", title: "Idea generation and validation" },
+    { id: "design-thinking", title: "Design thinking process" },
+    { id: "product-development", title: "Product development basics" }
+  ],
+  "business-planning": [
+    { id: "market-research", title: "Market research and analysis" },
+    { id: "business-plan", title: "Writing a business plan" },
+    { id: "financial-planning", title: "Financial planning and projections" },
+    { id: "funding-sources", title: "Funding sources and pitching" }
+  ],
+  "marketing": [
+    { id: "marketing-basics", title: "Marketing fundamentals" },
+    { id: "digital-marketing", title: "Digital marketing strategies" },
+    { id: "customer-acquisition", title: "Customer acquisition techniques" },
+    { id: "growth-hacking", title: "Growth hacking tactics" }
+  ]
+};
+
 function TopicsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -220,7 +399,25 @@ function TopicsContent() {
     xpReward: number;
     completed: boolean;
     locked: boolean;
+    subtopics: Array<{
+      id: string;
+      title: string;
+      completed: boolean;
+    }>;
   }>>([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTopic, setSelectedTopic] = useState<{
+    id: string;
+    title: string;
+    description: string;
+    xpReward: number;
+    subtopics: Array<{
+      id: string;
+      title: string;
+      completed: boolean;
+    }>;
+  } | null>(null);
 
   useEffect(() => {
     const subject = searchParams.get("subject") || "";
@@ -231,7 +428,11 @@ function TopicsContent() {
       const initialTopics = subjectTopics[subject].map((topic, index) => ({
         ...topic,
         completed: false,
-        locked: index !== 0 // Only first topic is unlocked
+        locked: index !== 0, // Only first topic is unlocked
+        subtopics: (topicSubtopics[topic.id] || []).map(st => ({
+          ...st,
+          completed: false
+        }))
       }));
       setTopics(initialTopics);
     }
@@ -293,6 +494,53 @@ function TopicsContent() {
     }
   };
 
+  const handleStartTopic = (topic: typeof topics[0]) => {
+    setSelectedTopic({
+      id: topic.id,
+      title: topic.title,
+      description: topic.description,
+      xpReward: topic.xpReward,
+      subtopics: topic.subtopics
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTopic(null);
+  };
+
+  const handleSubtopicComplete = (subtopicId: string) => {
+    if (!selectedTopic) return;
+
+    // Update subtopic completion in selected topic
+    const updatedSubtopics = selectedTopic.subtopics.map(st =>
+      st.id === subtopicId ? { ...st, completed: !st.completed } : st
+    );
+
+    setSelectedTopic({
+      ...selectedTopic,
+      subtopics: updatedSubtopics
+    });
+
+    // Also update in topics array
+    setTopics(prevTopics =>
+      prevTopics.map(topic =>
+        topic.id === selectedTopic.id
+          ? { ...topic, subtopics: updatedSubtopics }
+          : topic
+      )
+    );
+  };
+
+  const handleCompleteAll = () => {
+    if (!selectedTopic) return;
+
+    // Complete the topic and award XP
+    handleTopicComplete(selectedTopic.id, selectedTopic.xpReward);
+    handleCloseModal();
+  };
+
   const completedCount = topics.filter(t => t.completed).length;
   const totalTopics = topics.length;
   const progressPercentage = totalTopics > 0 ? (completedCount / totalTopics) * 100 : 0;
@@ -325,6 +573,20 @@ function TopicsContent() {
         achievement={achievement} 
         onClose={() => setAchievement(null)} 
       />
+
+      {/* Topic Detail Modal */}
+      {selectedTopic && (
+        <TopicDetailModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          topicTitle={selectedTopic.title}
+          topicDescription={selectedTopic.description}
+          subtopics={selectedTopic.subtopics}
+          xpReward={selectedTopic.xpReward}
+          onCompleteSubtopic={handleSubtopicComplete}
+          onCompleteAll={handleCompleteAll}
+        />
+      )}
 
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
@@ -419,8 +681,13 @@ function TopicsContent() {
               {topics.map((topic) => (
                 <TopicCard
                   key={topic.id}
-                  {...topic}
-                  onComplete={(xp) => handleTopicComplete(topic.id, xp)}
+                  id={topic.id}
+                  title={topic.title}
+                  description={topic.description}
+                  xpReward={topic.xpReward}
+                  completed={topic.completed}
+                  locked={topic.locked}
+                  onStart={() => handleStartTopic(topic)}
                 />
               ))}
             </div>

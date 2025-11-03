@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { BookOpen, CheckCircle2, Lock, Star } from "lucide-react";
-import { useState } from "react";
 
 interface TopicCardProps {
   id: string;
@@ -11,7 +10,7 @@ interface TopicCardProps {
   xpReward: number;
   completed: boolean;
   locked: boolean;
-  onComplete: (xp: number) => void;
+  onStart: () => void;
 }
 
 export default function TopicCard({ 
@@ -21,19 +20,8 @@ export default function TopicCard({
   xpReward, 
   completed, 
   locked,
-  onComplete 
+  onStart
 }: TopicCardProps) {
-  const [isCompleting, setIsCompleting] = useState(false);
-
-  const handleComplete = () => {
-    if (!completed && !locked) {
-      setIsCompleting(true);
-      setTimeout(() => {
-        onComplete(xpReward);
-        setIsCompleting(false);
-      }, 1500);
-    }
-  };
 
   return (
     <motion.div
@@ -83,29 +71,17 @@ export default function TopicCard({
         </div>
 
         <button
-          onClick={handleComplete}
-          disabled={completed || locked || isCompleting}
+          onClick={onStart}
+          disabled={completed || locked}
           className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${
             completed
               ? 'bg-green-500 text-white cursor-default'
               : locked
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : isCompleting
-              ? 'bg-blue-400 text-white cursor-wait'
               : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:-translate-y-1'
           }`}
         >
-          {isCompleting ? (
-            <span className="flex items-center justify-center gap-2">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-              >
-                <Star className="w-5 h-5" />
-              </motion.div>
-              Earning XP...
-            </span>
-          ) : completed ? (
+          {completed ? (
             <span className="flex items-center justify-center gap-2">
               <CheckCircle2 className="w-5 h-5" />
               Completed
@@ -120,25 +96,6 @@ export default function TopicCard({
           )}
         </button>
       </div>
-
-      {/* Completion Animation */}
-      {isCompleting && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="absolute inset-0 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 flex items-center justify-center"
-        >
-          <motion.div
-            animate={{ 
-              scale: [1, 1.2, 1],
-              rotate: [0, 360]
-            }}
-            transition={{ repeat: Infinity, duration: 1 }}
-          >
-            <Star className="w-20 h-20 text-orange-500 fill-current" />
-          </motion.div>
-        </motion.div>
-      )}
     </motion.div>
   );
 }
